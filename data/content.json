@@ -73,6 +73,17 @@
                 ]
             },
             {
+                "title": "Special Prints",
+                "icon": "fas fa-star",
+                "image": "assets/service-special.png",
+                "list": [
+                    "Less Print",
+                    "Mug Print",
+                    "T-Shirt Print",
+                    "Pen Print"
+                ]
+            },
+            {
                 "title": "Office Tech & Gifts",
                 "icon": "fas fa-briefcase",
                 "image": "assets/service-gifts.png",
@@ -109,7 +120,7 @@
         "title": "Visit Us Today",
         "desc": "We are located centrally in Kalamboli. Professional service guaranteed.",
         "address": "Shree Appartment, Shop No.13,<br>Plot No.5, Sector-1,<br>Kalamboli, Navi Mumbai - 410218",
-        "email": "metroprint7@gmail.com",
+        "email": "dubeyom1406@gmail.com",
         "phone": "+91 73740 29481",
         "timings": "Monday – Sunday: 9:00 AM – 10:00 PM"
     },

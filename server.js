@@ -23,8 +23,21 @@ const mimeTypes = {
     '.ico': 'image/x-icon'
 };
 
+// Email OTP Logic Removed as per user request
+
 const server = http.createServer((req, res) => {
     // console.log(`${req.method} ${req.url}`);
+
+    // CORS Headers (for safety, though served locally)
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+    if (req.method === 'OPTIONS') {
+        res.writeHead(200);
+        res.end();
+        return;
+    }
 
     // API: Get Content
     if (req.url === '/api/content' && req.method === 'GET') {
