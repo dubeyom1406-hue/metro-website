@@ -49,62 +49,83 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     </div>`
                 ).join('');
-            }
+                ).join('');
+}
 
-            // Gallery
-            const galleryGrid = document.querySelector('.gallery-grid');
-            if (galleryGrid && data.gallery) {
-                galleryGrid.innerHTML = data.gallery.map(item =>
-                    `<div class="gallery-item fade-in-scroll visible">
+            // Special Prints
+            const specialGrid = document.getElementById('special-grid');
+if (specialGrid && data.specialPrints) {
+    setText('special-title', data.specialPrints.title);
+    setText('special-subtitle', data.specialPrints.subtitle);
+
+    specialGrid.innerHTML = data.specialPrints.items.map(item =>
+        `<div class="special-card fade-in-scroll visible">
+                        <div class="special-img">
+                            <img src="${item.image}" alt="${item.title}">
+                        </div>
+                        <div class="special-info">
+                            <h3>${item.title}</h3>
+                            <p>${item.desc}</p>
+                            <a href="https://wa.me/91737402948?text=Hi, I want to inquire about ${item.title}" target="_blank" class="btn-sm">Inquire Now</a>
+                        </div>
+                    </div>`
+    ).join('');
+}
+
+// Gallery
+const galleryGrid = document.querySelector('.gallery-grid');
+if (galleryGrid && data.gallery) {
+    galleryGrid.innerHTML = data.gallery.map(item =>
+        `<div class="gallery-item fade-in-scroll visible">
                         <img src="${item.image}" alt="${item.caption}">
                         <div class="gallery-overlay">${item.caption}</div>
                     </div>`
-                ).join('');
-            }
+    ).join('');
+}
 
-            // Contact
-            setText('contact-desc', data.contact.desc);
-            setHTML('contact-address', data.contact.address);
-            setText('contact-email', data.contact.email);
-            setText('contact-phone', data.contact.phone);
-            setText('contact-timings', data.contact.timings);
+// Contact
+setText('contact-desc', data.contact.desc);
+setHTML('contact-address', data.contact.address);
+setText('contact-email', data.contact.email);
+setText('contact-phone', data.contact.phone);
+setText('contact-timings', data.contact.timings);
 
 
 
-            // Apply theme settings
-            applyTheme(data.theme);
+// Apply theme settings
+applyTheme(data.theme);
 
-            // Dynamic SEO Update
-            updateSEO(data);
+// Dynamic SEO Update
+updateSEO(data);
 
-            // Re-trigger animations for new elements
-            setupObserver();
+// Re-trigger animations for new elements
+setupObserver();
         })
-        .catch(err => console.log('Running in static mode or server error:', err));
+        .catch (err => console.log('Running in static mode or server error:', err));
 
-    // Mobile Menu Toggle
-    const menuToggle = document.querySelector('.menu-toggle');
-    const navLinks = document.querySelector('.nav-links');
+// Mobile Menu Toggle
+const menuToggle = document.querySelector('.menu-toggle');
+const navLinks = document.querySelector('.nav-links');
 
-    if (menuToggle) {
-        menuToggle.addEventListener('click', () => {
-            navLinks.classList.toggle('active');
-        });
-    }
-
-    // Smooth Scrolling
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            navLinks.classList.remove('active');
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({ behavior: 'smooth' });
-            }
-        });
+if (menuToggle) {
+    menuToggle.addEventListener('click', () => {
+        navLinks.classList.toggle('active');
     });
+}
 
-    setupObserver();
+// Smooth Scrolling
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        navLinks.classList.remove('active');
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({ behavior: 'smooth' });
+        }
+    });
+});
+
+setupObserver();
 });
 
 function setText(id, text) {
@@ -132,17 +153,17 @@ function setupObserver() {
 
 function applyTheme(theme) {
     if (!theme) return;
-    
+
     // Set CSS variables for theme
     const root = document.documentElement;
-    
+
     if (theme.primaryColor) root.style.setProperty('--secondary-dark', theme.primaryColor);
     if (theme.accentColor) root.style.setProperty('--accent-color', theme.accentColor);
     if (theme.backgroundColor) root.style.setProperty('--primary-white', theme.backgroundColor);
     if (theme.textColor) root.style.setProperty('--text-dark', theme.textColor);
     if (theme.secondaryColor) root.style.setProperty('--text-light', theme.secondaryColor);
     if (theme.borderColor) root.style.setProperty('--border-color', theme.borderColor);
-    
+
     // Update accent hover if accent color is changed
     if (theme.accentColor) {
         // Calculate a darker shade for hover effect

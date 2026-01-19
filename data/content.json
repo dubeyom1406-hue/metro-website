@@ -73,17 +73,6 @@
                 ]
             },
             {
-                "title": "Special Prints",
-                "icon": "fas fa-star",
-                "image": "assets/service-special.png",
-                "list": [
-                    "Less Print",
-                    "Mug Print",
-                    "T-Shirt Print",
-                    "Pen Print"
-                ]
-            },
-            {
                 "title": "Office Tech & Gifts",
                 "icon": "fas fa-briefcase",
                 "image": "assets/service-gifts.png",
@@ -95,6 +84,32 @@
                     "Photo Frames & Gift Toys",
                     "Novelty Items"
                 ]
+            }
+        ]
+    },
+    "specialPrints": {
+        "title": "Custom Printing Hub",
+        "subtitle": "Personalize Your World with High-Quality Prints",
+        "items": [
+            {
+                "title": "Mug Print",
+                "image": "assets/print-mug.png",
+                "desc": "Custom photos & text on ceramic mugs."
+            },
+            {
+                "title": "T-Shirt Print",
+                "image": "assets/print-tshirt.png",
+                "desc": "Premium fabric printing for events & branding."
+            },
+            {
+                "title": "Pen Print",
+                "image": "assets/print-pen.png",
+                "desc": "Engraved corporate & gift pens."
+            },
+            {
+                "title": "Less Print",
+                "image": "assets/service-printing.png",
+                "desc": "High-quality low volume printing."
             }
         ]
     },
@@ -110,10 +125,6 @@
         {
             "image": "assets/service-gifts.png",
             "caption": "Gifts & Novelty"
-        },
-        {
-            "image": "assets/uploads/1768789652131_1.jpeg",
-            "caption": "New Image"
         }
     ],
     "contact": {
