@@ -1,0 +1,124 @@
+{
+    "hero": {
+        "badge": "A Complete Printing Solution",
+        "title": "METRO STATIONERY <br>& JUMBO XEROX",
+        "subtitle": "Total Graphic Solutions From Concept To Doorstep",
+        "highlights": [
+            {
+                "text": "Xerox",
+                "icon": "fas fa-check"
+            },
+            {
+                "text": "Printout",
+                "icon": "fas fa-check"
+            },
+            {
+                "text": "Stationery",
+                "icon": "fas fa-check"
+            },
+            {
+                "text": "Rubber Stamp",
+                "icon": "fas fa-stamp"
+            },
+            {
+                "text": "Gifts",
+                "icon": "fas fa-check"
+            }
+        ]
+    },
+    "about": {
+        "title": "About Us",
+        "p1": "Welcome to <strong>METRO STATIONERY & JUMBO XEROX</strong>, the most trusted Printing Hub in <strong>Kalamboli, Navi Mumbai</strong>. With over 5+ years of expertise, we are the go-to destination for high-quality <strong>Jumbo Xerox, Digital Printing, and Corporate Gifts</strong>.",
+        "p2": "We serve students, architects, and businesses across Panvel and Raigad. From urgent <strong>Project Binding</strong> to professional <strong>Visiting Cards</strong> and <strong>Rubber Stamps</strong>, we deliver precision and speed. Visit our shop in Sector-1 for all your office needs.",
+        "stats": [
+            {
+                "value": "5+",
+                "label": "Years Experience"
+            },
+            {
+                "value": "10k+",
+                "label": "Happy Customers"
+            }
+        ]
+    },
+    "services": {
+        "title": "Our Premium Services",
+        "subtitle": "One Stop Solution for All Your Business & Personal Needs",
+        "items": [
+            {
+                "title": "Graphic & Digital Print",
+                "icon": "fas fa-palette",
+                "image": "assets/service-printing.png",
+                "list": [
+                    "Multi Colour Print & Digital Printout",
+                    "Banner Print & Vinyl Print",
+                    "Standy Sunboard & Sticker Print",
+                    "Brochure & Pamphlet Print",
+                    "Invitation Card & Envelopes",
+                    "Visiting Cards & Letter Head",
+                    "Bill Book & Black Book"
+                ]
+            },
+            {
+                "title": "Jumbo Xerox & Documents",
+                "icon": "fas fa-copy",
+                "image": "assets/shop-interior.png",
+                "list": [
+                    "A-1 Jumbo Xerox & Colour Scanning",
+                    "Black & White / Colour Xerox",
+                    "Spiral & Soft Binding / Lamination",
+                    "ID Card, Smart Card & PVC Card",
+                    "Passport Size Photo",
+                    "Print Out"
+                ]
+            },
+            {
+                "title": "Office Tech & Gifts",
+                "icon": "fas fa-briefcase",
+                "image": "assets/service-gifts.png",
+                "list": [
+                    "Cartridge Refilling (Ink & New)",
+                    "Rubber Stamp Making",
+                    "Computer Items & Accessories",
+                    "Office Stationery & Files",
+                    "Photo Frames & Gift Toys",
+                    "Novelty Items"
+                ]
+            }
+        ]
+    },
+    "gallery": [
+        {
+            "image": "assets/service-stationery.png",
+            "caption": "Premium Stationery"
+        },
+        {
+            "image": "assets/service-printing.png",
+            "caption": "High-Tech Printing"
+        },
+        {
+            "image": "assets/service-gifts.png",
+            "caption": "Gifts & Novelty"
+        },
+        {
+            "image": "assets/uploads/1768789652131_1.jpeg",
+            "caption": "New Image"
+        }
+    ],
+    "contact": {
+        "title": "Visit Us Today",
+        "desc": "We are located centrally in Kalamboli. Professional service guaranteed.",
+        "address": "Shree Appartment, Shop No.13,<br>Plot No.5, Sector-1,<br>Kalamboli, Navi Mumbai - 410218",
+        "email": "metroprint7@gmail.com",
+        "phone": "+91 73740 29481",
+        "timings": "Monday – Sunday: 9:00 AM – 10:00 PM"
+    },
+    "theme": {
+        "primaryColor": "#051025",
+        "accentColor": "#d4af37",
+        "backgroundColor": "#ffffff",
+        "textColor": "#2c2c2c",
+        "secondaryColor": "#5a5a5a",
+        "borderColor": "#e5e5e5"
+    }
+}

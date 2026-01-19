@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metro Admin Panel</title>
+    <link rel="icon" type="image/png" href="../assets/logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #0A1F44;
+            --accent: #FFD700;
+            --light: #f4f6f8;
+            --border: #e0e0e0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: var(--light);
+            color: #333;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        aside {
+            width: 250px;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand {
+            padding: 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .brand span {
+            color: var(--accent);
+        }
+
+        .menu {
+            flex: 1;
+            padding: 20px 0;
+        }
+
+        .menu-item {
+            padding: 15px 25px;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .menu-item:hover,
+        .menu-item.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--accent);
+            border-right: 3px solid var(--accent);
+        }
+
+        .logout {
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            color: #ff6b6b;
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        header {
+            background: white;
+            padding: 15px 30px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h2 {
+            font-weight: 500;
+        }
+
+        .btn-save {
+            background: #2ecc71;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-save:hover {
+            background: #27ae60;
+            transform: translateY(-1px);
+        }
+
+        .btn-view {
+            background: #3498db;
+            color: white;
+            text-decoration: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-right: 10px;
+            font-size: 0.9rem;
+        }
+
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px;
+        }
+
+        /* Forms */
+        .section-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 25px;
+            margin-bottom: 30px;
+            display: none;
+        }
+
+        .section-card.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        input[type="text"],
+        textarea,
+        input[type="email"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 0.95rem;
+        }
+
+        input:focus,
+        textarea:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        .help-text {
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        /* Gallery Manager */
+        .gallery-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .gallery-item-edit {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            background: #fff;
+            position: relative;
+        }
+
+        .gallery-item-edit img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+        }
+
+        .gallery-edit-actions {
+            padding: 10px;
+        }
+
+        .gallery-edit-actions input {
+            width: 100%;
+            margin-bottom: 5px;
+            font-size: 0.8rem;
+        }
+
+        .btn-remove {
+            width: 100%;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 5px;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+
+        .upload-box {
+            border: 2px dashed var(--border);
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+
+        .upload-box:hover {
+            border-color: var(--accent);
+            background: #fffcf0;
+        }
+
+        /* Loading Spinner */
+        #loader {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            color: var(--primary);
+        }
+
+        /* Status Toast */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #333;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 4px;
+            transform: translateY(100px);
+            transition: 0.3s;
+            z-index: 2000;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+        }
+
+        .toast.success {
+            background: #2ecc71;
+        }
+
+        .toast.error {
+            background: #e74c3c;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="loader"><i class="fas fa-spinner fa-spin"></i></div>
+
+    <aside>
+        <div class="brand">Metro <span>Admin</span></div>
+        <div class="menu">
+            <div class="menu-item active" onclick="switchTab('hero')"><i class="fas fa-home"></i> Home / Hero</div>
+            <div class="menu-item" onclick="switchTab('about')"><i class="fas fa-info-circle"></i> About Us</div>
+            <div class="menu-item" onclick="switchTab('services')"><i class="fas fa-layer-group"></i> Services</div>
+            <div class="menu-item" onclick="switchTab('gallery')"><i class="fas fa-images"></i> Gallery</div>
+            <div class="menu-item" onclick="switchTab('contact')"><i class="fas fa-address-book"></i> Contact</div>
+            <div class="menu-item" onclick="switchTab('theme')"><i class="fas fa-paint-brush"></i> Theme Customization
+            </div>
+        </div>
+        <div class="logout">
+            <i class="fas fa-sign-out-alt"></i> Exit Panel
+        </div>
+    </aside>
+
+    <main>
+        <header>
+            <h2 id="page-title">Home Page Settings</h2>
+            <div>
+                <a href="/" target="_blank" class="btn-view"><i class="fas fa-external-link-alt"></i> View Site</a>
+                <button class="btn-save" onclick="saveContent()"><i class="fas fa-save"></i> Save Changes</button>
+            </div>
+        </header>
+
+        <div class="content-area">
+            <!-- Hero Form -->
+            <div class="section-card active" id="tab-hero">
+                <h3>Hero Section</h3>
+                <br>
+                <form>
+                    <div class="form-group">
+                        <label>Top Badge Text</label>
+                        <input type="text" name="hero.badge">
+                    </div>
+                    <div class="form-group">
+                        <label>Main Title (HTML allowed)</label>
+                        <textarea name="hero.title"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Subtitle</label>
+                        <textarea name="hero.subtitle"></textarea>
+                    </div>
+                </form>
+            </div>
+
+            <!-- About Form -->
+            <div class="section-card" id="tab-about">
+                <h3>About Section</h3>
+                <br>
+                <form>
+                    <div class="form-group">
+                        <label>Section Title</label>
+                        <input type="text" name="about.title">
+                    </div>
+                    <div class="form-group">
+                        <label>Paragraph 1 (HTML)</label>
+                        <textarea name="about.p1"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Paragraph 2 (HTML)</label>
+                        <textarea name="about.p2"></textarea>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Services Form -->
+            <div class="section-card" id="tab-services">
+                <h3>Services Section</h3>
+                <br>
+                <form>
+                    <div class="form-group">
+                        <label>Main Title</label>
+                        <input type="text" name="services.title">
+                    </div>
+                    <div class="form-group">
+                        <label>Subtitle</label>
+                        <input type="text" name="services.subtitle">
+                    </div>
+                    <div class="form-group">
+                        <label>Services List (JSON Mode)</label>
+                        <p class="help-text">Edit the raw JSON for services here. Be careful with syntax.</p>
+                        <textarea name="services.items" style="height: 400px; font-family: monospace;"></textarea>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Gallery Manager -->
+            <div class="section-card" id="tab-gallery">
+                <h3>Gallery Management</h3>
+                <br>
+                <div class="upload-box" onclick="document.getElementById('file-upload').click()">
+                    <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; color: #aaa;"></i>
+                    <p style="margin-top: 10px;">Click to Upload New Image</p>
+                    <input type="file" id="file-upload" style="display: none;" accept="image/*"
+                        onchange="handleImageUpload(this)">
+                </div>
+
+                <div class="gallery-list" id="gallery-editor">
+                    <!-- Loaded via JS -->
+                </div>
+            </div>
+
+            <!-- Contact Form -->
+            <div class="section-card" id="tab-contact">
+                <h3>Contact Section</h3>
+                <br>
+                <form>
+                    <div class="form-group">
+                        <label>Contact Title</label>
+                        <input type="text" name="contact.title">
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <input type="text" name="contact.desc">
+                    </div>
+                    <div class="form-group">
+                        <label>Address (HTML for breaks)</label>
+                        <textarea name="contact.address"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" name="contact.email">
+                    </div>
+                    <div class="form-group">
+                        <label>Phone</label>
+                        <input type="text" name="contact.phone">
+                    </div>
+                    <div class="form-group">
+                        <label>Timings</label>
+                        <input type="text" name="contact.timings">
+                    </div>
+                </form>
+            </div>
+
+            <!-- Theme Customization Form -->
+            <div class="section-card" id="tab-theme">
+                <h3>Theme Customization</h3>
+                <br>
+                <form>
+                    <div class="form-group">
+                        <label>Primary Color</label>
+                        <input type="color" name="theme.primaryColor" value="#051025">
+                        <p class="help-text">Main background/text color (e.g., header, footer)</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Accent Color</label>
+                        <input type="color" name="theme.accentColor" value="#D4AF37">
+                        <p class="help-text">Highlight color for buttons, links, and special elements</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Background Color</label>
+                        <input type="color" name="theme.backgroundColor" value="#ffffff">
+                        <p class="help-text">Main background color for pages</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Text Color</label>
+                        <input type="color" name="theme.textColor" value="#2C2C2C">
+                        <p class="help-text">Main text color</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Secondary Color</label>
+                        <input type="color" name="theme.secondaryColor" value="#5A5A5A">
+                        <p class="help-text">Secondary text and UI elements</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Border Color</label>
+                        <input type="color" name="theme.borderColor" value="#E5E5E5">
+                        <p class="help-text">Color for borders and dividers</p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <div class="toast" id="toast">Changes Saved Successfully!</div>
+
+    <script>
+        let currentData = {};
+
+        // Load Data on Start
+        fetch('/api/content')
+            .then(res => res.json())
+            .then(data => {
+                currentData = data;
+                populateForms(data);
+                renderGalleryEditor();
+            });
+
+        function populateForms(data) {
+            const setVal = (name, val) => {
+                const el = document.querySelector(`[name="${name}"]`);
+                if (el) el.value = val;
+            };
+
+            setVal('hero.badge', data.hero.badge);
+            setVal('hero.title', data.hero.title);
+            setVal('hero.subtitle', data.hero.subtitle);
+
+            setVal('about.title', data.about.title);
+            setVal('about.p1', data.about.p1);
+            setVal('about.p2', data.about.p2);
+
+            setVal('services.title', data.services.title);
+            setVal('services.subtitle', data.services.subtitle);
+            setVal('services.items', JSON.stringify(data.services.items, null, 4));
+
+            setVal('contact.title', data.contact.title);
+            setVal('contact.desc', data.contact.desc);
+            setVal('contact.address', data.contact.address);
+            setVal('contact.email', data.contact.email);
+            setVal('contact.phone', data.contact.phone);
+            setVal('contact.timings', data.contact.timings);
+
+            // Theme settings
+            setVal('theme.primaryColor', data.theme?.primaryColor || '#051025');
+            setVal('theme.accentColor', data.theme?.accentColor || '#D4AF37');
+            setVal('theme.backgroundColor', data.theme?.backgroundColor || '#ffffff');
+            setVal('theme.textColor', data.theme?.textColor || '#2C2C2C');
+            setVal('theme.secondaryColor', data.theme?.secondaryColor || '#5A5A5A');
+            setVal('theme.borderColor', data.theme?.borderColor || '#E5E5E5');
+        }
+
+        // Gallery Logic
+        function renderGalleryEditor() {
+            const container = document.getElementById('gallery-editor');
+            if (!currentData.gallery) currentData.gallery = [];
+
+            container.innerHTML = currentData.gallery.map((item, index) => `
+                <div class="gallery-item-edit">
+                    <img src="../${item.image}" alt="Img" onerror="this.onerror=null; this.src='../assets/logo.png'; console.log('Failed to load image:', '${item.image}')">
+                    <div class="gallery-edit-actions">
+                        <input type="text" placeholder="Caption" value="${item.caption}" onchange="updateGalleryCaption(${index}, this.value)">
+                        <button type="button" class="btn-remove" onclick="removeGalleryItem(${index})"><i class="fas fa-trash"></i> Remove</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateGalleryCaption(index, value) {
+            currentData.gallery[index].caption = value;
+        }
+
+        function removeGalleryItem(index) {
+            // Prevent any form submission or default behavior
+            if (event) event.preventDefault();
+
+            if (confirm('Are you sure you want to remove this image?')) {
+                const imageToDelete = currentData.gallery[index];
+
+                // First, delete the actual file from the server
+                fetch('/api/delete-image', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ imagePath: imageToDelete.image })
+                })
+                    .then(res => res.json())
+                    .then(deleteRes => {
+                        if (deleteRes.success) {
+                            // File deleted successfully, now remove from gallery
+                            currentData.gallery.splice(index, 1);
+                            renderGalleryEditor();
+                            // Auto-save to persist changes
+                            saveContent();
+                            showToast('Image removed successfully!', 'success');
+                        } else {
+                            // File deletion failed, but still remove from gallery
+                            currentData.gallery.splice(index, 1);
+                            renderGalleryEditor();
+                            saveContent();
+                            showToast('Image removed from gallery but file deletion failed.', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Delete error:', error);
+                        // If delete request fails, still remove from gallery
+                        currentData.gallery.splice(index, 1);
+                        renderGalleryEditor();
+                        saveContent();
+                        showToast('Image removed from gallery but could not delete file.', 'error');
+                    });
+            }
+        }
+
+        function handleImageUpload(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                const reader = new FileReader();
+
+                document.getElementById('loader').style.display = 'flex';
+
+                reader.onload = function (e) {
+                    const base64Image = e.target.result;
+
+                    fetch('/api/upload', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name: file.name, image: base64Image })
+                    })
+                        .then(res => res.json())
+                        .then(res => {
+                            document.getElementById('loader').style.display = 'none';
+                            if (res.success) {
+                                // Add to gallery
+                                currentData.gallery.push({
+                                    image: res.path,
+                                    caption: "New Image"
+                                });
+                                renderGalleryEditor();
+                                showToast('Image Uploaded!', 'success');
+                            } else {
+                                showToast('Upload Failed: ' + res.error, 'error');
+                            }
+                        })
+                        .catch(e => {
+                            document.getElementById('loader').style.display = 'none';
+                            showToast('Server Error', 'error');
+                        });
+                };
+
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function collectData() {
+            const getVal = (name) => {
+                const el = document.querySelector(`[name="${name}"]`);
+                return el ? el.value : '';
+            };
+
+            // Deep clone to start to avoid reference issues
+            // But here we've been modifying currentData.gallery directly, which is fine.
+            const newData = JSON.parse(JSON.stringify(currentData));
+
+            newData.hero.badge = getVal('hero.badge');
+            newData.hero.title = getVal('hero.title');
+            newData.hero.subtitle = getVal('hero.subtitle');
+
+            newData.about.title = getVal('about.title');
+            newData.about.p1 = getVal('about.p1');
+            newData.about.p2 = getVal('about.p2');
+
+            newData.services.title = getVal('services.title');
+            newData.services.subtitle = getVal('services.subtitle');
+            try {
+                newData.services.items = JSON.parse(getVal('services.items'));
+            } catch (e) {
+                alert('Invalid JSON in Services List');
+                return null;
+            }
+
+            newData.contact.title = getVal('contact.title');
+            newData.contact.desc = getVal('contact.desc');
+            newData.contact.address = getVal('contact.address');
+            newData.contact.email = getVal('contact.email');
+            newData.contact.phone = getVal('contact.phone');
+            newData.contact.timings = getVal('contact.timings');
+
+            // Theme settings
+            if (!newData.theme) newData.theme = {};
+            newData.theme.primaryColor = getVal('theme.primaryColor');
+            newData.theme.accentColor = getVal('theme.accentColor');
+            newData.theme.backgroundColor = getVal('theme.backgroundColor');
+            newData.theme.textColor = getVal('theme.textColor');
+            newData.theme.secondaryColor = getVal('theme.secondaryColor');
+            newData.theme.borderColor = getVal('theme.borderColor');
+
+            // Gallery is already updated in newData because we cloned 'currentData' 
+            // and we were updating currentData.gallery in real-time.
+
+            return newData;
+        }
+
+        function saveContent() {
+            const newData = collectData();
+            if (!newData) return;
+
+            const btn = document.querySelector('.btn-save');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            btn.disabled = true;
+
+            fetch('/api/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newData)
+            })
+                .then(res => res.json())
+                .then(res => {
+                    btn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
+                    btn.disabled = false;
+
+                    if (res.success) {
+                        showToast('Changes Saved Successfully!', 'success');
+                    } else {
+                        console.error('Save Error:', res.error);
+                        showToast('Error Saving: ' + (res.error || 'Unknown Error'), 'error');
+                    }
+                })
+                .catch(err => {
+                    console.error('Network Error:', err);
+                    btn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
+                    btn.disabled = false;
+                    showToast('Connection Error: ' + err.message, 'error');
+                });
+        }
+
+        // Tabs
+        function switchTab(tabName) {
+            document.querySelectorAll('.section-card').forEach(el => el.classList.remove('active'));
+            const target = document.getElementById('tab-' + tabName);
+            if (target) target.classList.add('active');
+
+            document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
+            // Highlight current tab in menu - manual loop to find the one with onclick matching
+            // Using a simple workaround ->
+        }
+
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('click', function () {
+                document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        function showToast(msg, type) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.className = 'toast show ' + type;
+            setTimeout(() => {
+                toast.className = 'toast';
+            }, 3000);
+        }
+    </script>
+</body>
+
+</html>
