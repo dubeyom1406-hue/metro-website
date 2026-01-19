@@ -40,6 +40,44 @@ const server = http.createServer((req, res) => {
         return;
     }
 
+    // API: Login
+    if (req.url === '/api/login' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => body += chunk.toString());
+        req.on('end', () => {
+            try {
+                const { password } = JSON.parse(body);
+
+                // Read current password from DB
+                const currentData = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+                const savedPassword = currentData.admin?.password || 'Metro@2026'; // Fallback
+
+                if (password === savedPassword) {
+                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ success: true, token: 'metro-secure-session-v1' }));
+                } else {
+                    res.writeHead(401, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ success: false, error: 'Incorrect Password' }));
+                }
+            } catch (e) {
+                res.writeHead(400);
+                res.end(JSON.stringify({ success: false, error: 'Invalid Request' }));
+            }
+        });
+        return;
+    }
+
+    // AUTH MIDDLEWARE (Simple Check)
+    // APIs that require protection
+    if (['/api/save', '/api/upload', '/api/delete-image'].some(route => req.url.startsWith(route))) {
+        const authHeader = req.headers['authorization'];
+        if (authHeader !== 'Bearer metro-secure-session-v1') {
+            res.writeHead(401, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ success: false, error: 'Unauthorized: Please Login' }));
+            return;
+        }
+    }
+
     // API: Save Content
     if (req.url === '/api/save' && req.method === 'POST') {
         let body = '';
@@ -113,26 +151,26 @@ const server = http.createServer((req, res) => {
         req.on('end', () => {
             try {
                 const { imagePath } = JSON.parse(body);
-                
+
                 // Validate image path to prevent directory traversal
                 if (!imagePath || typeof imagePath !== 'string' || !imagePath.includes('assets/uploads/')) {
                     res.writeHead(400, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({ success: false, error: 'Invalid image path' }));
                     return;
                 }
-                
+
                 const fullPath = path.join(__dirname, imagePath);
-                
+
                 // Double check the path is within our upload directory
                 const normalizedPath = path.normalize(fullPath);
                 const uploadDirNormalized = path.normalize(UPLOAD_DIR);
-                
+
                 if (!normalizedPath.startsWith(uploadDirNormalized)) {
                     res.writeHead(400, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({ success: false, error: 'Invalid path' }));
                     return;
                 }
-                
+
                 fs.unlink(fullPath, (err) => {
                     if (err) {
                         console.error('Delete error:', err);

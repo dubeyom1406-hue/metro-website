@@ -313,6 +313,7 @@
             <div class="menu-item" onclick="switchTab('contact')"><i class="fas fa-address-book"></i> Contact</div>
             <div class="menu-item" onclick="switchTab('theme')"><i class="fas fa-paint-brush"></i> Theme Customization
             </div>
+            <div class="menu-item" onclick="switchTab('settings')"><i class="fas fa-cog"></i> Settings</div>
         </div>
         <div class="logout">
             <i class="fas fa-sign-out-alt"></i> Exit Panel
@@ -480,22 +481,78 @@
                     </div>
                 </form>
             </div>
+
+            <!-- Admin Settings -->
+            <div class="section-card" id="tab-settings">
+                <h3>Admin Settings</h3>
+                <br>
+                <form>
+                    <div class="form-group">
+                        <label>Change Admin Password</label>
+                        <input type="text" name="admin.password" placeholder="Enter new password">
+                        <p class="help-text">Be careful! Use a strong password.</p>
+                    </div>
+                </form>
+            </div>
         </div>
     </main>
 
     <div class="toast" id="toast">Changes Saved Successfully!</div>
 
+    <!-- Login Modal -->
+    <div id="login-modal"
+        style="position:fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:9000; display:flex; justify-content:center; align-items:center;">
+        <div
+            style="background:white; padding:40px; border-radius:10px; width:100%; max-width:400px; text-align:center;">
+            <h2 style="margin-bottom:20px; color:var(--primary);">Admin Security</h2>
+            <p style="margin-bottom:20px; color:#666;">Enter password to edit website.</p>
+            <input type="password" id="admin-pass" placeholder="Password"
+                style="width:100%; padding:12px; margin-bottom:20px; border:1px solid #ddd; border-radius:4px;">
+            <button onclick="attemptLogin()"
+                style="width:100%; padding:12px; background:var(--primary); color:white; border:none; border-radius:4px; font-weight:bold; cursor:pointer;">Login</button>
+            <p id="login-error" style="color:red; margin-top:15px; font-size:0.9rem;"></p>
+        </div>
+    </div>
+
     <script>
         let currentData = {};
+        let authToken = localStorage.getItem('metro_auth_token');
 
-        // Load Data on Start
-        fetch('/api/content')
-            .then(res => res.json())
-            .then(data => {
-                currentData = data;
-                populateForms(data);
-                renderGalleryEditor();
-            });
+        // Check Login State
+        if (authToken) {
+            document.getElementById('login-modal').style.display = 'none';
+            loadInitialData();
+        }
+
+        function attemptLogin() {
+            const pass = document.getElementById('admin-pass').value;
+            fetch('/api/login', {
+                method: 'POST',
+                body: JSON.stringify({ password: pass })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        authToken = data.token;
+                        localStorage.setItem('metro_auth_token', authToken);
+                        document.getElementById('login-modal').style.display = 'none';
+                        loadInitialData();
+                    } else {
+                        document.getElementById('login-error').textContent = 'Wrong Password!';
+                    }
+                })
+                .catch(e => document.getElementById('login-error').textContent = 'Server Connection Error');
+        }
+
+        function loadInitialData() {
+            fetch('/api/content')
+                .then(res => res.json())
+                .then(data => {
+                    currentData = data;
+                    populateForms(data);
+                    renderGalleryEditor();
+                });
+        }
 
         function populateForms(data) {
             const setVal = (name, val) => {
@@ -529,217 +586,241 @@
             setVal('theme.textColor', data.theme?.textColor || '#2C2C2C');
             setVal('theme.secondaryColor', data.theme?.secondaryColor || '#5A5A5A');
             setVal('theme.borderColor', data.theme?.borderColor || '#E5E5E5');
+
+            // Do NOT populate the password field for security (keep it blank)
+            setVal('admin.password', '');
         }
 
-        // Gallery Logic
-        function renderGalleryEditor() {
-            const container = document.getElementById('gallery-editor');
-            if (!currentData.gallery) currentData.gallery = [];
+        // ... (rest of functions need headers update)
+    </script>
+    <!-- Helper to update all fetch calls with headers -->
+    <script>
+        // Update saveContent to use Token
+        const originalSave = window.saveContent; 
+    </script>
 
-            container.innerHTML = currentData.gallery.map((item, index) => `
-                <div class="gallery-item-edit">
-                    <img src="../${item.image}" alt="Img" onerror="this.onerror=null; this.src='../assets/logo.png'; console.log('Failed to load image:', '${item.image}')">
-                    <div class="gallery-edit-actions">
-                        <input type="text" placeholder="Caption" value="${item.caption}" onchange="updateGalleryCaption(${index}, this.value)">
-                        <button type="button" class="btn-remove" onclick="removeGalleryItem(${index})"><i class="fas fa-trash"></i> Remove</button>
-                    </div>
-                </div>
-            `).join('');
-        }
+    // Gallery Logic
+    function renderGalleryEditor() {
+    const container = document.getElementById('gallery-editor');
+    if (!currentData.gallery) currentData.gallery = [];
 
-        function updateGalleryCaption(index, value) {
-            currentData.gallery[index].caption = value;
-        }
+    container.innerHTML = currentData.gallery.map((item, index) => `
+    <div class="gallery-item-edit">
+        <img src="../${item.image}" alt="Img"
+            onerror="this.onerror=null; this.src='../assets/logo.png'; console.log('Failed to load image:', '${item.image}')">
+        <div class="gallery-edit-actions">
+            <input type="text" placeholder="Caption" value="${item.caption}"
+                onchange="updateGalleryCaption(${index}, this.value)">
+            <button type="button" class="btn-remove" onclick="removeGalleryItem(${index})"><i class="fas fa-trash"></i>
+                Remove</button>
+        </div>
+    </div>
+    `).join('');
+    }
 
-        function removeGalleryItem(index) {
-            // Prevent any form submission or default behavior
-            if (event) event.preventDefault();
+    function updateGalleryCaption(index, value) {
+    currentData.gallery[index].caption = value;
+    }
 
-            if (confirm('Are you sure you want to remove this image?')) {
-                const imageToDelete = currentData.gallery[index];
+    function removeGalleryItem(index) {
+    // Prevent any form submission or default behavior
+    if (event) event.preventDefault();
 
-                // First, delete the actual file from the server
-                fetch('/api/delete-image', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ imagePath: imageToDelete.image })
-                })
-                    .then(res => res.json())
-                    .then(deleteRes => {
-                        if (deleteRes.success) {
-                            // File deleted successfully, now remove from gallery
-                            currentData.gallery.splice(index, 1);
-                            renderGalleryEditor();
-                            // Auto-save to persist changes
-                            saveContent();
-                            showToast('Image removed successfully!', 'success');
-                        } else {
-                            // File deletion failed, but still remove from gallery
-                            currentData.gallery.splice(index, 1);
-                            renderGalleryEditor();
-                            saveContent();
-                            showToast('Image removed from gallery but file deletion failed.', 'error');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Delete error:', error);
-                        // If delete request fails, still remove from gallery
-                        currentData.gallery.splice(index, 1);
-                        renderGalleryEditor();
-                        saveContent();
-                        showToast('Image removed from gallery but could not delete file.', 'error');
-                    });
-            }
-        }
+    if (confirm('Are you sure you want to remove this image?')) {
+    const imageToDelete = currentData.gallery[index];
 
-        function handleImageUpload(input) {
-            if (input.files && input.files[0]) {
-                const file = input.files[0];
-                const reader = new FileReader();
+    // First, delete the actual file from the server
+    fetch('/api/delete-image', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ imagePath: imageToDelete.image })
+    })
+    .then(res => res.json())
+    .then(deleteRes => {
+    if (deleteRes.success) {
+    // File deleted successfully, now remove from gallery
+    currentData.gallery.splice(index, 1);
+    renderGalleryEditor();
+    // Auto-save to persist changes
+    saveContent();
+    showToast('Image removed successfully!', 'success');
+    } else {
+    // File deletion failed, but still remove from gallery
+    currentData.gallery.splice(index, 1);
+    renderGalleryEditor();
+    saveContent();
+    showToast('Image removed from gallery but file deletion failed.', 'error');
+    }
+    })
+    .catch(error => {
+    console.error('Delete error:', error);
+    // If delete request fails, still remove from gallery
+    currentData.gallery.splice(index, 1);
+    renderGalleryEditor();
+    saveContent();
+    showToast('Image removed from gallery but could not delete file.', 'error');
+    });
+    }
+    }
 
-                document.getElementById('loader').style.display = 'flex';
+    function handleImageUpload(input) {
+    if (input.files && input.files[0]) {
+    const file = input.files[0];
+    const reader = new FileReader();
 
-                reader.onload = function (e) {
-                    const base64Image = e.target.result;
+    document.getElementById('loader').style.display = 'flex';
 
-                    fetch('/api/upload', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ name: file.name, image: base64Image })
-                    })
-                        .then(res => res.json())
-                        .then(res => {
-                            document.getElementById('loader').style.display = 'none';
-                            if (res.success) {
-                                // Add to gallery
-                                currentData.gallery.push({
-                                    image: res.path,
-                                    caption: "New Image"
-                                });
-                                renderGalleryEditor();
-                                showToast('Image Uploaded!', 'success');
-                            } else {
-                                showToast('Upload Failed: ' + res.error, 'error');
-                            }
-                        })
-                        .catch(e => {
-                            document.getElementById('loader').style.display = 'none';
-                            showToast('Server Error', 'error');
-                        });
-                };
+    reader.onload = function (e) {
+    const base64Image = e.target.result;
 
-                reader.readAsDataURL(file);
-            }
-        }
+    fetch('/api/upload', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: file.name, image: base64Image })
+    })
+    .then(res => res.json())
+    .then(res => {
+    document.getElementById('loader').style.display = 'none';
+    if (res.success) {
+    // Add to gallery
+    currentData.gallery.push({
+    image: res.path,
+    caption: "New Image"
+    });
+    renderGalleryEditor();
+    showToast('Image Uploaded!', 'success');
+    } else {
+    showToast('Upload Failed: ' + res.error, 'error');
+    }
+    })
+    .catch(e => {
+    document.getElementById('loader').style.display = 'none';
+    showToast('Server Error', 'error');
+    });
+    };
 
-        function collectData() {
-            const getVal = (name) => {
-                const el = document.querySelector(`[name="${name}"]`);
-                return el ? el.value : '';
-            };
+    reader.readAsDataURL(file);
+    }
+    }
 
-            // Deep clone to start to avoid reference issues
-            // But here we've been modifying currentData.gallery directly, which is fine.
-            const newData = JSON.parse(JSON.stringify(currentData));
+    function collectData() {
+    const getVal = (name) => {
+    const el = document.querySelector(`[name="${name}"]`);
+    return el ? el.value : '';
+    };
 
-            newData.hero.badge = getVal('hero.badge');
-            newData.hero.title = getVal('hero.title');
-            newData.hero.subtitle = getVal('hero.subtitle');
+    // Deep clone to start to avoid reference issues
+    // But here we've been modifying currentData.gallery directly, which is fine.
+    const newData = JSON.parse(JSON.stringify(currentData));
 
-            newData.about.title = getVal('about.title');
-            newData.about.p1 = getVal('about.p1');
-            newData.about.p2 = getVal('about.p2');
+    newData.hero.badge = getVal('hero.badge');
+    newData.hero.title = getVal('hero.title');
+    newData.hero.subtitle = getVal('hero.subtitle');
 
-            newData.services.title = getVal('services.title');
-            newData.services.subtitle = getVal('services.subtitle');
-            try {
-                newData.services.items = JSON.parse(getVal('services.items'));
-            } catch (e) {
-                alert('Invalid JSON in Services List');
-                return null;
-            }
+    newData.about.title = getVal('about.title');
+    newData.about.p1 = getVal('about.p1');
+    newData.about.p2 = getVal('about.p2');
 
-            newData.contact.title = getVal('contact.title');
-            newData.contact.desc = getVal('contact.desc');
-            newData.contact.address = getVal('contact.address');
-            newData.contact.email = getVal('contact.email');
-            newData.contact.phone = getVal('contact.phone');
-            newData.contact.timings = getVal('contact.timings');
+    newData.services.title = getVal('services.title');
+    newData.services.subtitle = getVal('services.subtitle');
+    try {
+    newData.services.items = JSON.parse(getVal('services.items'));
+    } catch (e) {
+    alert('Invalid JSON in Services List');
+    return null;
+    }
 
-            // Theme settings
-            if (!newData.theme) newData.theme = {};
-            newData.theme.primaryColor = getVal('theme.primaryColor');
-            newData.theme.accentColor = getVal('theme.accentColor');
-            newData.theme.backgroundColor = getVal('theme.backgroundColor');
-            newData.theme.textColor = getVal('theme.textColor');
-            newData.theme.secondaryColor = getVal('theme.secondaryColor');
-            newData.theme.borderColor = getVal('theme.borderColor');
+    newData.contact.title = getVal('contact.title');
+    newData.contact.desc = getVal('contact.desc');
+    newData.contact.address = getVal('contact.address');
+    newData.contact.email = getVal('contact.email');
+    newData.contact.phone = getVal('contact.phone');
+    newData.contact.timings = getVal('contact.timings');
 
-            // Gallery is already updated in newData because we cloned 'currentData' 
-            // and we were updating currentData.gallery in real-time.
+    // Theme settings
+    if (!newData.theme) newData.theme = {};
+    newData.theme.primaryColor = getVal('theme.primaryColor');
+    newData.theme.accentColor = getVal('theme.accentColor');
+    newData.theme.backgroundColor = getVal('theme.backgroundColor');
+    newData.theme.textColor = getVal('theme.textColor');
+    newData.theme.secondaryColor = getVal('theme.secondaryColor');
+    newData.theme.borderColor = getVal('theme.borderColor');
 
-            return newData;
-        }
+    // Admin Settings
+    if (!newData.admin) newData.admin = {};
+    const newPass = getVal('admin.password');
+    if (newPass) {
+    newData.admin.password = newPass;
+    } else {
+    // Keep existing if blank
+    newData.admin.password = currentData.admin?.password || 'Metro@2026';
+    }
 
-        function saveContent() {
-            const newData = collectData();
-            if (!newData) return;
+    // Gallery is already updated in newData because we cloned 'currentData'
+    // and we were updating currentData.gallery in real-time.
 
-            const btn = document.querySelector('.btn-save');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-            btn.disabled = true;
+    return newData;
+    }
 
-            fetch('/api/save', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(newData)
-            })
-                .then(res => res.json())
-                .then(res => {
-                    btn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
-                    btn.disabled = false;
+    function saveContent() {
+    const newData = collectData();
+    if (!newData) return;
 
-                    if (res.success) {
-                        showToast('Changes Saved Successfully!', 'success');
-                    } else {
-                        console.error('Save Error:', res.error);
-                        showToast('Error Saving: ' + (res.error || 'Unknown Error'), 'error');
-                    }
-                })
-                .catch(err => {
-                    console.error('Network Error:', err);
-                    btn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
-                    btn.disabled = false;
-                    showToast('Connection Error: ' + err.message, 'error');
-                });
-        }
+    const btn = document.querySelector('.btn-save');
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+    btn.disabled = true;
 
-        // Tabs
-        function switchTab(tabName) {
-            document.querySelectorAll('.section-card').forEach(el => el.classList.remove('active'));
-            const target = document.getElementById('tab-' + tabName);
-            if (target) target.classList.add('active');
+    fetch('/api/save', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(newData)
+    })
+    .then(res => res.json())
+    .then(res => {
+    btn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
+    btn.disabled = false;
 
-            document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
-            // Highlight current tab in menu - manual loop to find the one with onclick matching
-            // Using a simple workaround ->
-        }
+    if (res.success) {
+    showToast('Changes Saved Successfully!', 'success');
+    } else {
+    console.error('Save Error:', res.error);
+    showToast('Error Saving: ' + (res.error || 'Unknown Error'), 'error');
+    }
+    })
+    .catch(err => {
+    console.error('Network Error:', err);
+    btn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
+    btn.disabled = false;
+    showToast('Connection Error: ' + err.message, 'error');
+    });
+    }
 
-        document.querySelectorAll('.menu-item').forEach(item => {
-            item.addEventListener('click', function () {
-                document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
-                this.classList.add('active');
-            });
-        });
+    // Tabs
+    function switchTab(tabName) {
+    document.querySelectorAll('.section-card').forEach(el => el.classList.remove('active'));
+    const target = document.getElementById('tab-' + tabName);
+    if (target) target.classList.add('active');
 
-        function showToast(msg, type) {
-            const toast = document.getElementById('toast');
-            toast.textContent = msg;
-            toast.className = 'toast show ' + type;
-            setTimeout(() => {
-                toast.className = 'toast';
-            }, 3000);
-        }
+    document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
+    // Highlight current tab in menu - manual loop to find the one with onclick matching
+    // Using a simple workaround ->
+    }
+
+    document.querySelectorAll('.menu-item').forEach(item => {
+    item.addEventListener('click', function () {
+    document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+    this.classList.add('active');
+    });
+    });
+
+    function showToast(msg, type) {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.className = 'toast show ' + type;
+    setTimeout(() => {
+    toast.className = 'toast';
+    }, 3000);
+    }
     </script>
 </body>
 

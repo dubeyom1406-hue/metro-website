@@ -120,5 +120,8 @@
         "textColor": "#2c2c2c",
         "secondaryColor": "#5a5a5a",
         "borderColor": "#e5e5e5"
+    },
+    "admin": {
+        "password": "Metro@2026"
     }
 }
