@@ -70,7 +70,7 @@ const server = http.createServer((req, res) => {
     // AUTH MIDDLEWARE (Simple Check)
     // APIs that require protection
     if (['/api/save', '/api/upload', '/api/delete-image'].some(route => req.url.startsWith(route))) {
-        const authHeader = req.headers['authorization'];
+        const authHeader = req.headers['authorization'] || req.headers['Authorization'];
         if (authHeader !== 'Bearer metro-secure-session-v1') {
             res.writeHead(401, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ success: false, error: 'Unauthorized: Please Login' }));

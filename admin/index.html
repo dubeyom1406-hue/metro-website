@@ -315,7 +315,7 @@
             </div>
             <div class="menu-item" onclick="switchTab('settings')"><i class="fas fa-cog"></i> Settings</div>
         </div>
-        <div class="logout">
+        <div class="logout" onclick="logout()">
             <i class="fas fa-sign-out-alt"></i> Exit Panel
         </div>
     </aside>
@@ -609,8 +609,7 @@
             setVal('admin.password', '');
         }
 
-        // ... (rest of functions need headers update)
-        }
+
 
 
         // Gallery Logic
@@ -843,6 +842,13 @@
             setTimeout(() => {
                 toast.className = 'toast';
             }, 3000);
+        }
+        
+        function logout() {
+            if (confirm('Are you sure you want to log out?')) {
+                localStorage.removeItem('metro_auth_token');
+                window.location.reload();
+            }
         }
     </script>
 </body>
