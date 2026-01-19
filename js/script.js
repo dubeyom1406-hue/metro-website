@@ -49,17 +49,16 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     </div>`
                 ).join('');
-                ).join('');
-}
+            }
 
             // Special Prints
             const specialGrid = document.getElementById('special-grid');
-if (specialGrid && data.specialPrints) {
-    setText('special-title', data.specialPrints.title);
-    setText('special-subtitle', data.specialPrints.subtitle);
+            if (specialGrid && data.specialPrints) {
+                setText('special-title', data.specialPrints.title);
+                setText('special-subtitle', data.specialPrints.subtitle);
 
-    specialGrid.innerHTML = data.specialPrints.items.map(item =>
-        `<div class="special-card fade-in-scroll visible">
+                specialGrid.innerHTML = data.specialPrints.items.map(item =>
+                    `<div class="special-card fade-in-scroll visible">
                         <div class="special-img">
                             <img src="${item.image}" alt="${item.title}">
                         </div>
@@ -69,63 +68,63 @@ if (specialGrid && data.specialPrints) {
                             <a href="https://wa.me/91737402948?text=Hi, I want to inquire about ${item.title}" target="_blank" class="btn-sm">Inquire Now</a>
                         </div>
                     </div>`
-    ).join('');
-}
+                ).join('');
+            }
 
-// Gallery
-const galleryGrid = document.querySelector('.gallery-grid');
-if (galleryGrid && data.gallery) {
-    galleryGrid.innerHTML = data.gallery.map(item =>
-        `<div class="gallery-item fade-in-scroll visible">
+            // Gallery
+            const galleryGrid = document.querySelector('.gallery-grid');
+            if (galleryGrid && data.gallery) {
+                galleryGrid.innerHTML = data.gallery.map(item =>
+                    `<div class="gallery-item fade-in-scroll visible">
                         <img src="${item.image}" alt="${item.caption}">
                         <div class="gallery-overlay">${item.caption}</div>
                     </div>`
-    ).join('');
-}
+                ).join('');
+            }
 
-// Contact
-setText('contact-desc', data.contact.desc);
-setHTML('contact-address', data.contact.address);
-setText('contact-email', data.contact.email);
-setText('contact-phone', data.contact.phone);
-setText('contact-timings', data.contact.timings);
+            // Contact
+            setText('contact-desc', data.contact.desc);
+            setHTML('contact-address', data.contact.address);
+            setText('contact-email', data.contact.email);
+            setText('contact-phone', data.contact.phone);
+            setText('contact-timings', data.contact.timings);
 
 
 
-// Apply theme settings
-applyTheme(data.theme);
+            // Apply theme settings
+            applyTheme(data.theme);
 
-// Dynamic SEO Update
-updateSEO(data);
+            // Dynamic SEO Update
+            updateSEO(data);
 
-// Re-trigger animations for new elements
-setupObserver();
+            // Re-trigger animations for new elements
+            setupObserver();
         })
-        .catch (err => console.log('Running in static mode or server error:', err));
+        .catch(err => console.log('Running in static mode or server error:', err));
 
-// Mobile Menu Toggle
-const menuToggle = document.querySelector('.menu-toggle');
-const navLinks = document.querySelector('.nav-links');
+    // Mobile Menu Toggle
+    const menuToggle = document.querySelector('.menu-toggle');
+    const navLinks = document.querySelector('.nav-links');
 
-if (menuToggle) {
-    menuToggle.addEventListener('click', () => {
-        navLinks.classList.toggle('active');
+    if (menuToggle) {
+        menuToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+    }
+
+    // Smooth Scrolling
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            navLinks.classList.remove('active');
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
     });
-}
 
-// Smooth Scrolling
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        navLinks.classList.remove('active');
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-            target.scrollIntoView({ behavior: 'smooth' });
-        }
-    });
-});
-
-setupObserver();
+    setupObserver();
 });
 
 function setText(id, text) {
